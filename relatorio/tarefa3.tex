@@ -1,20 +1,59 @@
 \documentclass[]{article}
 \usepackage[utf8x]{inputenc}
+\usepackage{abstract} 
+\usepackage{titlesec}
 \usepackage[brazil,english]{babel}
 \usepackage{amsmath,amssymb,amsfonts,amstext}
 \usepackage{color}
+\usepackage{listings} 
+\usepackage[section]{placeins}
 
 \definecolor{red}{rgb}{1,0,0}
 \definecolor{blue}{rgb}{0,0,1}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+	backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+	basicstyle=\small,        % the size of the fonts that are used for the code
+	breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+	breaklines=true,                 % sets automatic line breaking
+	captionpos=b,                    % sets the caption-position to bottom
+	commentstyle=\color{mygreen},    % comment style
+	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+	extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+	keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+	keywordstyle=\color{blue},       % keyword style
+	language=C,                 	   % the language of the code
+	numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+	numbersep=5pt,                   % how far the line-numbers are from the code
+	numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+	rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+	showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+	showstringspaces=false,          % underline spaces within strings only
+	showtabs=false,                  % show tabs within strings adding particular underscores
+	%  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+	stringstyle=\color{mymauve},     % string literal style
+	tabsize=2,	                   % sets default tabsize to 2 spaces
+	title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
 
 %opening
-\title{Profiling}
-\author{Bruno da Silva Machado}
-
+\title{\vspace{-5mm}\fontsize{16pt}{10pt} \bfseries{Profiling}}
+\author{\large 
+	\textsc{Bruno da Silva Machado$^{1}$}\thanks{brunosilvamachado@id.uff.br} 
+	\quad
+	\\[2mm] \normalsize 
+	% COLOQUE AQUI O ENDEREÇO DE SUA INSTITUIÇÃO
+	$^1$ Curso de Bacharelado em Física com ênfase em Física Computacional,\\ Instituto de Ciências Exatas, Universidade Federal Fluminense,\\ 
+	27213-145 Volta Redonda - RJ, Brasil\\
+	\vspace{-5mm}}
 \begin{document}
 
 \maketitle
 
+\selectlanguage{brazil}
 \begin{abstract}
 
 Neste artigo vamos efetuar o profiling de dois programas escritos na linguagem C. O primeiro é usa o método da relaxação para descrever um potencial elétrico ao redor de um para-raio, enquanto o segundo programa usa o método de Jacobi para a solução de sistemas de equações lineares. Fazer o profiling dos programas é muito importante pois permite reunir informações sobre o comportamento de um programa, isto é o uso dos recursos do mesmo. e não só isso auxilia na otimização do código pois nos mostra quais funções são as mais utilizadas e se é possível otimiza-las.
@@ -37,9 +76,102 @@ Dentro dos arquivos possui as seguintes funções: \textit{\textcolor{red}{doubl
 
 \section{O profiling}
 
-\subsection{Profiling sem otimização}
+\subsection{Programa 1}
 
-\subsection{Profiling com otimização de código}
+\subsubsection{ Profiling sem otimização}
 
-\subsection{Profiling com otimização de flags}
+A tabela \ref{tab:tab1} é o resultado do profiling do programa sem otimizações do compilador ou de código.
+
+\begin{table}[h]
+	\caption{Profiling do programa 1 sem otimização}
+	\label{tab:tab1}
+	\begin{tabular}{c c c c c c l}
+		\hline
+	    \% time & \begin{minipage}{1.5cm}\centering cumulative\\seconds \end{minipage}& \begin{minipage}{1.5cm}\centering self\\ seconds\end{minipage}& calls &\begin{minipage}{1.5cm}\centering self\\ ms/call\end{minipage} &\begin{minipage}{1.5cm}\centering  total\\ ms/call\end{minipage}& name \\ \hline 
+	          
+		\textcolor{red}{99.92}& 93.83&    \textcolor{red}{93.83}&    72340&     1.30  & 1.30  &\textcolor{red}{relaxacao}\\
+		0.34&     94.15&     0.32&   144680 &    0.00    & 0.00  &trs\\
+		0.27&     94.40&     0.25&    72340 &    0.00    & 0.00  &periodo\\
+		0.00&     94.40&     0.00&        1 &    0.00    & 0.00  &contorno\\
+		0.00&     94.40&     0.00&        1 &    0.00    & 0.00  &imprime
+	\end{tabular}
+\end{table}
+
+Na tabela \ref{tab:tab1} temos as seguintes colunas.A primeira coluna informa a  porcentagem do tempo total de execução do programa usado por esta função, a segunda coluna são os segundo acumulados que é uma soma corrente do numero de segundos contabilizados pelas funções listadas acima,a terceira coluna é o numero de segundos contabilizados por esta função sozinha. Este é o tipo principal da tabela. A quarta coluna é o numero de vezes que a função é invocada, se esta for perfilada, senão fica em branco, a quinta coluna é o valor médio de milissegundos gasto nesta função por chamada, se esta função tiver perfil, senão em branco. A sexta coluna é o numero média de milissegundos gastos neste e em seus descendentes por chamada, se esta função é perfilada, senão em branco, a ultima coluna são os nomes das funções estas estão ordenadas pelo numero de segundos contabilizadas individualmente.
+
+Através deste profile vemos que a função que mais consome tempo de memoria é o \textit{\textcolor{red}{void} \textcolor{blue}{relaxacao()}} com 99.92\% do tempo de execução, vale ressaltar que ela é a função que vai solucionar a equação de laplace através do método da relaxação, isso justifica o fato de ser a função que mais tempo fica na memoria mas o seu tempo de execução sozinho que é extremamente alto nos revela que ela é a fonte de gargalo no programa e é esta que deve ser otimizada para aumentar o desempenho do código. 
+
+\subsubsection{Profiling com otimização de código}
+
+A partir da seção anterior já sabemos que a função que causa o gargalo é o \textit{\textcolor{red}{void} \textcolor{blue}{relaxacao()}}. Nessa seção vamos buscar otimizar o código desta função para isso usaremos uma técnica bem simples que é simplificar se possível as operações aritméticas em termos de soma e produto.
+
+\begin{lstlisting}
+// metodo antes da otimizacao
+void relaxacao()
+{
+    int i,j;
+
+    for(i = 1;i < N - 1; i++)
+    {
+        for(j = 1; j < N - 1;j++)
+        {
+            if(mascara[i][j] == 0)
+            matriz[i][j] = (matriz[i - 1][j] + matriz[i + 1][j] + matriz[i][j - 1] + matriz[i][j + 1])/4.0;
+       }
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}
+//metodo depois da otimizacao do codigo
+void relaxacao()
+{
+	int i,j;
+
+	for(i = 1;i < N - 1; i++)
+	{
+		for(j = 1; j < N - 1;j++)
+		{
+			if(mascara[i][j] == 0)
+			matriz[i][j] = (matriz[i - 1][j] + matriz[i + 1][j] + matriz[i][j - 1] + matriz[i][j + 1])*0.25;
+		}
+	}
+}
+\end{lstlisting}
+
+Na tabela \ref{tab:tab2} podemos ver temos os novos resultados após a otimização, lembrando que as colunas desta tabela tem o mesmo significado da tabela \ref{tab:tab1}. Podemos ver na tabela que a função \textit{\textcolor{red}{void} \textcolor{blue}{relaxacao()}} apresenta uma redução de 11\% no tempo de execução sozinha, mas ela continua sendo a função que passa maior tempo em execução.   
+
+\begin{table}[h]
+	\caption{Profiling do programa 1 com otimização de código}
+	\label{tab:tab2}
+	\begin{tabular}{c c c c c c l}
+		\hline
+		\% time & \begin{minipage}{1.5cm}\centering cumulative\\seconds \end{minipage}& \begin{minipage}{1.5cm}\centering self\\ seconds\end{minipage}& calls &\begin{minipage}{1.5cm}\centering self\\ ms/call\end{minipage} &\begin{minipage}{1.5cm}\centering  total\\ ms/call\end{minipage}& name \\ \hline 
+		
+		99.62 &   83.44  &   \textcolor{red}{83.44} &  72340   &  1.15   &  1.15 & \textcolor{red}{relaxacao}\\
+		0.46  &   83.83  &   0.38  & 144680   &  0.00   &  0.00 & trs\\
+		0.43  &   84.19  &   0.36  &  72340   &  0.01   &  0.01 & periodo\\
+		0.02  &   84.21  &   0.02  &          &         &       & main\\
+		0.00  &   84.21  &   0.00  &      1   &  0.00   &  0.00 & contorno\\
+		0.00  &   84.21  &   0.00  &      1   &  0.00   &  0.00 & imprime
+	\end{tabular}
+\end{table}
+
+\subsubsection{Profiling com otimização de codigo e flags}
+
+Por fim com o código devidamente otimizado vamos buscar agora uma melhor performance usando as flags de otimização do compilador. Nesse trabalho compilamos o código usado GNU GCC Compiler versão 5.31 e as flags foram \textit{\textcolor{mymauve}{-O2 -march=corei7-avx}}. Podemos ver na tabela \ref{tab:tab3} um ganho de performance absurdo no programa comparando os valores da tabela \ref{tab:tab1} o ganho foi de 65\% um excelente resultado nos revelando que a otimização do código foi um sucesso   
+
+\begin{table}[h]
+	\caption{Profiling do programa 1 com otimização de código + flags -O2 -march=corei7-avx}
+	\label{tab:tab3}
+	\begin{tabular}{c c c c c c l}
+		\hline
+		\% time & \begin{minipage}{1.5cm}\centering cumulative\\seconds \end{minipage}& \begin{minipage}{1.5cm}\centering self\\ seconds\end{minipage}& calls &\begin{minipage}{1.5cm}\centering self\\ us/call\end{minipage} &\begin{minipage}{1.5cm}\centering  total\\ us/call\end{minipage}& name \\ \hline 
+		
+		99.42 &   32.73  &   \textcolor{blue}{32.73} &  72340   &  452.45   &  452.45 & \textcolor{blue}{relaxacao}\\
+		0.58  &   32.92  &   0.19  &         &        &        &  main\\
+		0.00  &  32.92   &  0.00   &     1   &  0.00  &   0.00 & imprime\\
+	\end{tabular}
+\end{table}
+
 \end{document}
