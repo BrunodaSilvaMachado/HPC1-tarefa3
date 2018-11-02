@@ -1,0 +1,41 @@
+\documentclass[]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage[brazil,english]{babel}
+\usepackage{amsmath,amssymb,amsfonts,amstext}
+
+%opening
+\title{Profiling}
+\author{Bruno da Silva Machado}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+Neste artigo vamos efetuar o profiling de dois programas escritos na linguagem C. O primeiro é usa o método da relaxação para descrever um potencial elétrico ao redor de um para-raio, enquanto o segundo programa usa o método de Jacobi para a solução de sistemas de equações lineares. Fazer o profiling dos programas é muito importante pois permite reunir informações sobre o comportamento de um programa, isto é o uso dos recursos do mesmo. e não só isso auxilia na otimização do código pois nos mostra quais funções são as mais utilizadas e se é possível otimiza-las.
+
+\end{abstract}
+
+\section{Descrição dos programas}
+
+\paragraph{O primeiro programa} consiste em solucionar o problema do para-raio que consiste em descobrir o comportamento do potencial elétrico ao redor de uma para-raio. Este problema é descrito pela equação de Laplace, esta por sua vez pode ser solucionado pelo método da relaxação. 
+
+O arquivo que possuí o código deste problema é o "relaxacaoPeriodo.c" e a versão otimizada do código é a  "relaxacaoPeridoOtimizado.c". 
+
+Dentro dos arquivos possui as seguintes funções: \textit{void contorno()} responsável de gerar as condições de contorno na matriz de relaxação. O \textit{void relaxacao()} função responsável de fazer a relaxação da matriz é assim solucionar a equação de laplace, \textit{void periodo()} adiciona e faz a manutenção das condições de periodicidade da matriz de relaxação, o \textit{void imprime()} imprime os dados da matriz dentro de uma arquivo de texto. \textit{void trs()} é a função responsável pela condição de parada que consiste em verificar se o traço da matriz é menor que um certo valor $\epsilon$. Por fim a \textit{int main()} é a entrada do programa e é o local onde as demais funções são chamadas.
+
+\paragraph{O segundo programa} consiste em ler um arquivo de texto com um sistema de equações lineares de quantidade de incógnitas arbitraria e soluciona -lo através do método de Jacobi.
+
+O arquivo que possuí o código deste problema é o "metodoJacobi.c" e a versão otimizada do código é a  "metodoJacobiOtimizado.c". 
+
+Dentro dos arquivos possui as seguintes funções: \textit{double norm()} responsável calcular a norma de um vetor de dimensão $N$. O \textit{double * metodoJacobi()} é um algoritmo clássico para resolver sistemas de equações lineares. Raramente utilizado em sistemas lineares de pequenas dimensões, já que o tempo requerido para obter um minimo de precisão ultrapassa o requerido pelas técnicas diretas como a eliminação gaussiana. Contudo para sistemas grandes, com grande porcentagem de entradas de zeros, essa técnica aparece como uma alternativa mais eficiente. \textit{double * substituicaoRegressiva()} usada neste programa para calcular as raízes do sistema de equações, o \textit{int triangularSuperior\_p()} reduz a matriz para a forma de triangular superior com pivotamento entre as linhas. \textit{double **lerMatrizCompleta()} recebe o nome do arquivo contendo o sistema de equações lineares e carrega para a memoria para ser usada pelo programa, \textit{void imprimeMatrizCompleta()} e \textit{imprimeRaiz()} imprime a matriz informada e as soluçoes dos sistemas lineares respectivamente.  Por fim a \textit{int main()} é a entrada do programa e é o local onde as demais funções são chamadas.
+
+\section{O profiling}
+
+\subsection{Profiling sem otimização}
+
+\subsection{Profiling com otimização de código}
+
+\subsection{Profiling com otimização de flags}
+\end{document}
